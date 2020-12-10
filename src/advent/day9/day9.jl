@@ -37,6 +37,13 @@ inputRecordSource = recordSourceFactory("src/advent/day9/input.txt")
 ####
 
 function part1(recordSource, preambleLength)
+    function isvalid(v, arr)
+        for i = 1:length(arr)-1, j = i+1:length(arr)
+            arr[i] + arr[j] == v && return true
+        end
+        false
+    end
+
     preamble = Array{Int64, 1}(undef, preambleLength)
     foreach(i -> preamble[i] = iterate(recordSource)[1], 1:preambleLength)
     for value ∈ recordSource
