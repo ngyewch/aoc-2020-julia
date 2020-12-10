@@ -44,7 +44,7 @@ function part1(recordSource, preambleLength)
         false
     end
 
-    preamble = Array{Int64, 1}(undef, preambleLength)
+    preamble = Array{eltype(recordSource), 1}(undef, preambleLength)
     foreach(i -> preamble[i] = iterate(recordSource)[1], 1:preambleLength)
     for value ∈ recordSource
         !isvalid(value, preamble) && return value
@@ -63,7 +63,7 @@ benchmark && @btime part1(inputRecordSource(), 25);
 ####
 
 function part2(recordSource, invalidNumber)
-    window = Array{Int64, 1}()
+    window = Array{eltype(recordSource), 1}()
     for value ∈ recordSource
         push!(window, value)
         while true
