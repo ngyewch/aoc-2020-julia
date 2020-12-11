@@ -47,7 +47,7 @@ function process(layout, numberOfOccupiedSeats, occupiedSeatsThreshold; trace = 
         trace && dump(layout)
         !hasChanged && break
     end
-    layout |> Cat() |> Filter(c -> isoccupied(c)) |> Map(c -> 1) |> foldxl(+; init = 0)
+    layout |> Cat() |> Filter(c -> isOccupied(c)) |> Map(c -> 1) |> foldxl(+; init = 0)
 end
 
 #### part 1
@@ -92,7 +92,6 @@ end
 
 part2(layout; trace = false) = process(layout, numberOfVisibleOccupiedSeats, 5; trace = trace)
 
-@show part2(readLayout("src/advent/day11/example.txt"))
 @assert part2(readLayout("src/advent/day11/example.txt")) == 26
 
 @show part2(readLayout("src/advent/day11/input.txt"))
