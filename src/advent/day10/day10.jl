@@ -33,7 +33,7 @@ benchmark && @btime part1(inputData);
 #### part 2
 
 function part2(data)
-    function collate(x, y)
+    function collate(x::Array{Tuple{Int64, Int64}, 1}, y::Int64)
         if isempty(x)
             push!(x, (y, 1))
         else
@@ -47,7 +47,7 @@ function part2(data)
         x
     end
 
-    # magic numbers?
+    # permutations per consecutive positions
     multipliers = [1, 2, 4, 7]
 
     data1 = sort(data)
@@ -57,10 +57,10 @@ function part2(data)
 
     zip(x, y) |> 
     Map(r -> r[2] - r[1]) |> 
-    foldxt(collate; init = Array{Tuple{eltype(data1), Int64}, 1}()) |> 
+    foldxl(collate; init = Array{Tuple{Int64, Int64}, 1}()) |> 
     Filter(r -> r[1] == 1 && r[2] > 1) |>
     Map(r -> multipliers[r[2]]) |>
-    foldxt(*; init = 1)
+    foldxl(*; init = 1)
 end
 
 @assert part2(example1Data) == 8
