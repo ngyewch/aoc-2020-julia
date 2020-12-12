@@ -1,6 +1,5 @@
 using BenchmarkTools
 using Printf
-using Transducers
 
 benchmark = true
 
