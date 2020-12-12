@@ -57,20 +57,29 @@ function run(filename, entity; trace = false)
     close(f)
 end
 
+#### Point
+
+struct Point
+    x::Int64
+    y::Int64
+end
+
+Base.:+(a::Point, b::Tuple{Int64, Int64}) = Point(a.x + b[1], a.y + b[2])
+
+toString(point::Point) = @sprintf("(%s, %s)", point.x, point.y)
+
+manhattanDistance(point::Point) = abs(point.x) + abs(point.y)
+
 #### part 1
 
 ## Vehicle
 
 mutable struct Vehicle
-    x::Int64
-    y::Int64
+    position::Point
     heading::Direction
 end
 
-function doDirection(vehicle::Vehicle, direction::Direction, distance::Int64)
-    vehicle.x += direction.dx * distance
-    vehicle.y += direction.dy * distance
-end
+doDirection(vehicle::Vehicle, direction::Direction, distance::Int64) = vehicle.position += (direction.dx * distance, direction.dy * distance)
 
 doF(vehicle::Vehicle, distance::Int64) = doDirection(vehicle, vehicle.heading, distance)
 
@@ -80,14 +89,14 @@ end
 
 doL(vehicle::Vehicle, degrees::Int64) = doR(vehicle, -degrees)
 
-toString(vehicle::Vehicle) = @sprintf("(%d, %d) %s", vehicle.x, vehicle.y, vehicle.heading.name)
+toString(vehicle::Vehicle) = @sprintf("%s %s", toString(vehicle.position), vehicle.heading.name)
 
 ##
 
 function part1(filename; trace=false)
-    vehicle = Vehicle(0, 0, east)
+    vehicle = Vehicle(Point(0, 0), east)
     run(filename, vehicle; trace = trace)
-    abs(vehicle.x) + abs(vehicle.y)
+    manhattanDistance(vehicle.position)
 end
 
 @assert part1(exampleFilename) == 25
@@ -100,41 +109,30 @@ benchmark && @btime part1(inputFilename);
 ## Vehicle2
 
 mutable struct Vehicle2
-    x::Int64
-    y::Int64
-    wx::Int64
-    wy::Int64
+    position::Point
+    waypoint::Point
     heading::Direction
 end
 
-function doDirection(vehicle::Vehicle2, direction::Direction, distance::Int64)
-    vehicle.wx += direction.dx * distance
-    vehicle.wy += direction.dy * distance
-end
+doDirection(vehicle::Vehicle2, direction::Direction, distance::Int64) = vehicle.waypoint += (direction.dx * distance, direction.dy * distance)
 
-function doF(vehicle::Vehicle2, value::Int64)
-    vehicle.x += vehicle.wx * value
-    vehicle.y += vehicle.wy * value
-end
+doF(vehicle::Vehicle2, value::Int64) = vehicle.position += (vehicle.waypoint.x * value, vehicle.waypoint.y * value)
 
 function doR(vehicle::Vehicle2, degrees::Int64)
     radians = Base.Math.deg2rad(degrees)
-    wx = round(vehicle.wx * cos(radians) + vehicle.wy * sin(radians))
-    wy = round(vehicle.wy * cos(radians) - vehicle.wx * sin(radians))
-    vehicle.wx = wx
-    vehicle.wy = wy
+    vehicle.waypoint = Point(round(vehicle.waypoint.x * cos(radians) + vehicle.waypoint.y * sin(radians)), round(vehicle.waypoint.y * cos(radians) - vehicle.waypoint.x * sin(radians)))
 end
 
 doL(vehicle::Vehicle2, degrees::Int64) = doR(vehicle, -degrees)
 
-toString(vehicle::Vehicle2) = @sprintf("(%d, %d) (%d, %d) %s", vehicle.x, vehicle.y, vehicle.wx, vehicle.wy, vehicle.heading.name)
+toString(vehicle::Vehicle2) = @sprintf("%s %s %s", toString(vehicle.position), toString(vehicle.waypoint), vehicle.heading.name)
 
 ##
 
 function part2(filename; trace=false)
-    vehicle = Vehicle2(0, 0, 10, 1, east)
+    vehicle = Vehicle2(Point(0, 0), Point(10, 1), east)
     run(filename, vehicle; trace = trace)
-    abs(vehicle.x) + abs(vehicle.y)
+    manhattanDistance(vehicle.position)
 end
 
 @assert part2(exampleFilename) == 286
